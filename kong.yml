@@ -1,0 +1,32 @@
+_format_version: "2.1"
+_transform: true
+
+services:
+  - name: nodejs-api
+    url: http://dev-api-platform-nodejs-api-service.dev-api-platform:3000
+    routes:
+      - name: nodejs-api-route
+        paths:
+          - /api
+        methods:
+          - GET
+          - POST
+    plugins:
+      - name: jwt-cognito
+        config:
+          aws_region: eu-west-1
+          user_pool_id: ${COGNITO_USER_POOL_ID}
+          client_id: ${COGNITO_CLIENT_ID}
+          whitelist:
+            - /api/health
+
+  # Example service for documentation purposes
+  - name: example-service
+    url: http://example-service:8080
+    routes:
+      - name: example-route
+        paths:
+          - /example
+        methods:
+          - GET
+          - POST

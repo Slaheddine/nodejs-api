@@ -1,0 +1,23 @@
+FROM kong:latest
+
+# Install required packages
+USER root
+RUN apt-get update && \
+    apt-get install -y git unzip curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Kong Cognito plugin
+RUN luarocks install kong-plugin-jwt-cognito
+
+# Set up Kong configuration
+COPY kong.yml /usr/local/kong/declarative/kong.yml
+ENV KONG_DATABASE=postgres
+ENV KONG_DECLARATIVE_CONFIG=/usr/local/kong/declarative/kong.yml
+ENV KONG_PLUGINS=bundled,jwt-cognito
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD kong health
+
+USER kong
